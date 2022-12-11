@@ -162,6 +162,13 @@ public class MainManager {
         return string.replace(this.getTOKEN(),"");
     }
 
+    // TODO améliorer, utiliser substring
+    public boolean isAuthenticated(String msg) {
+        System.out.println("isAuthenticated : " + msg.contains(this.getTOKEN()));
+        return msg.substring(0, this.getTOKEN().length()).equals(this.getTOKEN());
+        //return msg.contains(this.getTOKEN());
+    }
+
     public void setReceivedText(String text) {
         window.setTextDisplayMessage(text);
     }

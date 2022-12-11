@@ -83,20 +83,30 @@ public class Server extends Thread {
                 public void run() {
                     System.out.println("Serveur démarré");
                     try {
+                        /*
                         msg = in.readLine();
                         msg = manager.removeToken(msg);
                         System.out.println("Client : " + msg);
                         getManager().setReceivedText(msg);
+*/
 
                         //tant que le client est connecté
-                        while (msg != null && getIsRunning()) {
+                        do {
                             //isRunning = isAuthenticated(msg, TOKEN);
                             //msg = removeToken(in.readLine(), TOKEN);  // TODO enlever token
                             msg = in.readLine();
-                            msg = manager.removeToken(msg); // *********************************
-                            System.out.println("Client : " + msg);
-                            getManager().setReceivedText(msg);
+                            if(manager.isAuthenticated(msg)) {
+                                msg = manager.removeToken(msg); // *********************************
+                                System.out.println("Message Client : " + msg);
+                                getManager().setReceivedText(msg);
+                            }
+                            else {
+                                // TODO faire autre chose ?
+                                setIsRunning(false);
+                            }
+
                         }
+                        while (msg != null && getIsRunning());
                         //sortir de la boucle si le client a déconecté
                         System.out.println("Client déconnecté");
                         //fermer le flux et la session socket

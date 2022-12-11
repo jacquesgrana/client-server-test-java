@@ -75,19 +75,29 @@ public class Client extends Thread{
                 @Override
                 public void run() {
                     try {
+                        /*
                         msg = in.readLine();
                         msg = manager.removeToken(msg);
                         System.out.println("Réponse Serveur : " + msg);
                         getManager().setReceivedText(msg);
-                        while(msg!=null && getIsRunning()){
+                         */
+                        do {
                             //isRunning = isAuthenticated(msg, TOKEN);
 
                             //msg = removeToken(in.readLine(), TOKEN); // TODO enlever token
                             msg =in.readLine();
-                            msg = manager.removeToken(msg); // ********************************************
-                            System.out.println("Réponse Serveur : " + msg);
-                            getManager().setReceivedText(msg);
+                            if(manager.isAuthenticated(msg)) {
+                                msg = manager.removeToken(msg); // ********************************************
+                                System.out.println("Message Serveur : " + msg);
+                                getManager().setReceivedText(msg);
+                            }
+                            else {
+                                // TODO faire autre chose ?
+                                setIsRunning(false);
+                            }
+
                         }
+                        while(msg!=null && getIsRunning());
                         System.out.println("Serveur déconnecté");
                         out.close();
                         clientSocket.close();
