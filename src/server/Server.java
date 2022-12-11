@@ -19,7 +19,7 @@ public class Server extends Thread {
     String textToSend = null;
     BufferedReader in;
     PrintWriter out;
-    ServerSocket serveurSocket ;
+    ServerSocket serveurSocket;
     Socket clientSocket;
 
     MainManager manager;
@@ -29,7 +29,6 @@ public class Server extends Thread {
     }
 
     public void run() {
-
 
 
         //final Scanner sc = new Scanner(System.in);//pour lire à partir du clavier
@@ -43,53 +42,31 @@ public class Server extends Thread {
             manager.setInfosDisplayed("Client connecté");
             manager.setConnexionServerState(true);
             out = new PrintWriter(clientSocket.getOutputStream());
-            in = new BufferedReader (new InputStreamReader(clientSocket.getInputStream()));
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             /**
              * Send thread
              */
             Thread send = new Thread(new Runnable() {
                 String msg;
+
                 @Override
                 public void run() {
 
-                    while(getIsRunning()){
-                        //msg = addToken(sc.nextLine(), TOKEN); // TODO ajouter token
-                        // isRunning[0] = isAuthenticated(msg, TOKEN);
+                    while (getIsRunning()) {
 
-/*
-                        msg = sc.nextLine();
+                        msg = getTextToSend();
 
                         if (msg != null) {
+                            System.out.println("Envoi vers Client : " + msg);
+                            msg = manager.addToken(msg); // **************************************************
                             out.println(msg);
                             out.flush();
-                            System.out.println("Envoi vers Client : " + msg);
                             msg = null;
-                        }*/
+                            setTextToSend(null);
+                        }
 
 
-
-                        //if(getIsNewMessage()) {
-                            msg = getTextToSend();
-                            //System.out.println("message a envoyer : " + getTextToSend());
-
-                        /*
-                            try {
-                                Thread.sleep(100);
-                            }
-                            catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }*/
-
-                            if (msg != null) {
-                                out.println(msg);
-                                out.flush();
-                                System.out.println("Envoi vers Client : " + msg);
-                                msg = null;
-                                setTextToSend(null);
-                            }
-                            //setIsNewMessage(false);
-                       // }
                     }
                 }
             });
@@ -100,23 +77,24 @@ public class Server extends Thread {
              * Receive thread
              */
             Thread receive = new Thread(new Runnable() {
-                String msg ;
+                String msg;
+
                 @Override
                 public void run() {
                     System.out.println("Serveur démarré");
                     try {
                         msg = in.readLine();
+                        msg = manager.removeToken(msg);
                         System.out.println("Client : " + msg);
-                        // TODO ajouter appel fonction du manager qui modifie l'affichage
                         getManager().setReceivedText(msg);
 
                         //tant que le client est connecté
-                        while(msg!=null && getIsRunning()){
+                        while (msg != null && getIsRunning()) {
                             //isRunning = isAuthenticated(msg, TOKEN);
                             //msg = removeToken(in.readLine(), TOKEN);  // TODO enlever token
                             msg = in.readLine();
+                            msg = manager.removeToken(msg); // *********************************
                             System.out.println("Client : " + msg);
-                            // TODO ajouter appel fonction du manager qui modifie l'affichage
                             getManager().setReceivedText(msg);
                         }
                         //sortir de la boucle si le client a déconecté
@@ -132,7 +110,7 @@ public class Server extends Thread {
             });
             receive.start();
             //receive.run();
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -148,7 +126,7 @@ public class Server extends Thread {
             clientSocket.close();
             serveurSocket.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            //throw new RuntimeException(e);
         }
 
     }

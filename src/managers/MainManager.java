@@ -12,6 +12,8 @@ public class MainManager {
     Client client;
     Server server;
 
+    final String TOKEN = "54gh7856dqd";
+
     boolean isClientLaunched = false, isServerLaunched = false;
 
     public MainManager() {
@@ -144,11 +146,21 @@ public class MainManager {
             window.setConnexionServerStateIcon(window.getImageIconConnexionState(Color.RED));
         }
     }
-
+    public void stopApp() {
+        System.exit(0);
+    }
     public void setInfosDisplayed(String text) {
         window.setTextInfos(text);
     }
 
+
+    public String addToken(String string) {
+        return this.getTOKEN() + string;
+    }
+
+    public String removeToken(String string) {
+        return string.replace(this.getTOKEN(),"");
+    }
 
     public void setReceivedText(String text) {
         window.setTextDisplayMessage(text);
@@ -178,7 +190,7 @@ public class MainManager {
         return this.client;
     }
 
-    public void stopApp() {
-        System.exit(0);
+    public String getTOKEN() {
+        return TOKEN;
     }
 }

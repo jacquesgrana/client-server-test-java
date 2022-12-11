@@ -50,28 +50,14 @@ public class Client extends Thread{
                 @Override
                 public void run() {
                     while(getIsRunning()){
-                        /*
-                        //msg = addToken(sc.nextLine(), TOKEN); // TODO ajouter token
-                        msg = sc.nextLine();
                         //isRunning[0] = isAuthenticated(msg, TOKEN);
-                        out.println(msg);
-                        out.flush();
-                        System.out.println("Envoi vers Serveur : " + msg);*/
-
                         msg = getTextToSend();
-                        /*
-                        //System.out.println("message a envoyer : " + getTextToSend());
-                        try {
-                            Thread.sleep(100);
-                        }
-                        catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }*/
 
                         if (msg != null) {
+                            System.out.println("Envoi vers Serveur : " + msg);
+                            msg = manager.addToken(msg); // **************************************************
                             out.println(msg);
                             out.flush();
-                            System.out.println("Envoi vers Serveur : " + msg);
                             msg = null;
                             setTextToSend(null);
                         }
@@ -90,6 +76,7 @@ public class Client extends Thread{
                 public void run() {
                     try {
                         msg = in.readLine();
+                        msg = manager.removeToken(msg);
                         System.out.println("Réponse Serveur : " + msg);
                         getManager().setReceivedText(msg);
                         while(msg!=null && getIsRunning()){
@@ -97,12 +84,14 @@ public class Client extends Thread{
 
                             //msg = removeToken(in.readLine(), TOKEN); // TODO enlever token
                             msg =in.readLine();
+                            msg = manager.removeToken(msg); // ********************************************
                             System.out.println("Réponse Serveur : " + msg);
                             getManager().setReceivedText(msg);
                         }
                         System.out.println("Serveur déconnecté");
                         out.close();
                         clientSocket.close();
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
