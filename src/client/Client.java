@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Scanner;
 
 public class Client extends Thread{
@@ -75,33 +76,39 @@ public class Client extends Thread{
                 @Override
                 public void run() {
                     try {
-                        /*
-                        msg = in.readLine();
-                        msg = manager.removeToken(msg);
-                        System.out.println("Réponse Serveur : " + msg);
-                        getManager().setReceivedText(msg);
-                         */
                         do {
-                            //isRunning = isAuthenticated(msg, TOKEN);
-
-                            //msg = removeToken(in.readLine(), TOKEN); // TODO enlever token
                             msg =in.readLine();
                             if(manager.isAuthenticated(msg)) {
                                 msg = manager.removeToken(msg); // ********************************************
-                                System.out.println("Message Serveur : " + msg);
-                                getManager().setReceivedText(msg);
+                                if(!msg.equals("QUIT")) {
+                                    System.out.println("Message Serveur : " + msg);
+                                    getManager().setReceivedText(msg);
+                                }
+                                else {
+                                    setIsRunning(false);
+                                    stopClient();
+                                    //getManager().clicButtonClient();
+                                    manager.setClientButtonState(false);
+                                }
+
                             }
                             else {
-                                // TODO faire autre chose ?
-                                setIsRunning(false);
+                                // TODO faire autre chose ? --> envoyer message de refus
+                                //setIsRunning(false);
+                                setTextToSend("Message refusé : non autorisé");
                             }
 
                         }
                         while(msg!=null && getIsRunning());
+                        stopClient();
+                        getManager().clicButtonClient();
+                        /*
                         System.out.println("Serveur déconnecté");
+                        in.close();
                         out.close();
+                        //clientSocket.shutdownOutput(); // a tester
                         clientSocket.close();
-
+                        System.out.println("Client arrêté");*/
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -110,6 +117,8 @@ public class Client extends Thread{
             receive.start();
             //receive.run();
 
+        } catch (SocketException e) {
+            //e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -121,6 +130,21 @@ public class Client extends Thread{
 
         setIsRunning(false);
         manager.setConnexionClientState(false);
+        manager.setInfosDisplayed("");
+        try {
+            if (in != null) in.close();
+            if (out != null) out.close();
+
+            if (clientSocket != null && !clientSocket.isClosed()) {
+                //clientSocket.shutdownOutput(); // a tester
+                clientSocket.close();
+            }
+        } catch (SocketException e) {
+            //e.printStackTrace();
+        } catch (IOException e) {
+            //throw new RuntimeException(e);
+        }
+
     }
 
     public void startClient() {

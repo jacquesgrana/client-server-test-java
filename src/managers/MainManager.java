@@ -73,6 +73,21 @@ public class MainManager {
         window.setTextWriteMessage("");
     }
 
+    public void setClientButtonState(boolean isRunning) {
+        if(isRunning) {
+            this.isServerLaunched = false;
+            window.disableButtonServer();
+            window.enableButtonMessage();
+            window.setTextButtonClient("Arrêter le Client");
+        }
+        else {
+            window.enableButtonServer();
+            window.disableButtonMessage();
+            window.setTextButtonClient("Lancer le Client");
+        }
+
+    }
+
     private void runClient() {
         System.out.println("manager : run client");
         // this.isClientLaunched = true;
@@ -164,8 +179,14 @@ public class MainManager {
 
     // TODO améliorer, utiliser substring
     public boolean isAuthenticated(String msg) {
-        System.out.println("isAuthenticated : " + msg.contains(this.getTOKEN()));
-        return msg.substring(0, this.getTOKEN().length()).equals(this.getTOKEN());
+        //System.out.println("isAuthenticated : " + msg.contains(this.getTOKEN()));
+        if(msg != null) {
+            return msg.substring(0, this.getTOKEN().length()).equals(this.getTOKEN());
+        }
+        else {
+            return false;
+        }
+
         //return msg.contains(this.getTOKEN());
     }
 
